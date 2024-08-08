@@ -129,6 +129,7 @@ const NoteManager = () => {
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: '#f1f1f1',
@@ -142,8 +143,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerText: {
+    fontFamily: 'amaticSCBold',
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: 'regular',
   },
   addNoteButton: {
     backgroundColor: '#9b59b6',
@@ -157,6 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
+    fontFamily: 'amaticSCBold',
     flex: 1,
     backgroundColor: 'white',
     paddingVertical: 12,
@@ -204,7 +207,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   noteText: {
-    fontSize: 16,
+    fontFamily: 'amaticSCBold',
+    fontSize:24,
     color: 'white',
   },
   expandedControls: {
