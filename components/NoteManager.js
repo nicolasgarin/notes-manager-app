@@ -238,9 +238,19 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 12,
     marginBottom: 16,
+    transform: [{ scale: 1 }],
+    opacity: 1,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    overflow: 'hidden',
   },
   expandedNote: {
     width: '100%',
+    transform: [{ scale: 1.05 }],
+    elevation: 8,
   },
   noteText: {
     fontFamily: 'amaticSCBold',
@@ -268,6 +278,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     alignSelf: 'flex-end',
+    transform: [{ scale: 1 }],
+    opacity: 1,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 
