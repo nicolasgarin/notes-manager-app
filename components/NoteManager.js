@@ -1,15 +1,33 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput } from 'react-native';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, useColorScheme } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NoteManager = () => {
   const [notes, setNotes] = useState([]);
   const [newNoteColor, setNewNoteColor] = useState('#9b59b6');
   const [newNoteText, setNewNoteText] = useState('');
   const [expandedNoteId, setExpandedNoteId] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const colors = ['#9b59b6', '#3498db', '#2ecc71', '#e67e22', '#e74c3c'];
+
+  useEffect(() => {
+    const loadDarkMode = async () => {
+      const savedMode = await AsyncStorage.getItem('isDarkMode');
+      if (savedMode !== null) {
+        setIsDarkMode(JSON.parse(savedMode));
+      }
+    };
+    loadDarkMode();
+  }, []);
+
+  const toggleDarkMode = async () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    await AsyncStorage.setItem('isDarkMode', JSON.stringify(newMode));
+  };
 
   const createNote = () => {
     if (newNoteText.trim() !== '') {
@@ -47,17 +65,21 @@ const NoteManager = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Mis Notas</Text>
+        <Text style={[styles.headerText, isDarkMode && styles.darkText]}>Mis Notas</Text>
         <TouchableOpacity style={styles.addNoteButton} onPress={createNote}>
           <Feather name="plus" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.darkModeButton} onPress={toggleDarkMode}>
+          <Feather name={isDarkMode ? "sun" : "moon"} size={24} color={isDarkMode ? "white" : "black"} />
         </TouchableOpacity>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, isDarkMode && styles.darkInput]}
           placeholder="Escribe tu nueva nota..."
+          placeholderTextColor={isDarkMode ? "#999" : "#666"}
           value={newNoteText}
           onChangeText={setNewNoteText}
         />
@@ -92,7 +114,7 @@ const NoteManager = () => {
               {expandedNoteId === note.id && (
                 <View style={styles.expandedControls}>
                   <TextInput
-                    style={styles.expandedInput}
+                    style={[styles.expandedInput, isDarkMode && styles.darkExpandedInput]}
                     value={note.text}
                     onChangeText={(text) => updateNoteText(note.id, text)}
                   />
@@ -129,12 +151,14 @@ const NoteManager = () => {
 };
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#f1f1f1',
     paddingHorizontal: 20,
     paddingVertical: 30,
+  },
+  darkContainer: {
+    backgroundColor: '#121212',
   },
   headerContainer: {
     flexDirection: 'row',
@@ -146,12 +170,19 @@ const styles = StyleSheet.create({
     fontFamily: 'amaticSCBold',
     fontSize: 24,
     fontWeight: 'regular',
+    color: '#000',
+  },
+  darkText: {
+    color: '#fff',
   },
   addNoteButton: {
     backgroundColor: '#9b59b6',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 8,
+  },
+  darkModeButton: {
+    padding: 10,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -166,6 +197,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 8,
     marginRight: 12,
+    color: '#000',
+  },
+  darkInput: {
+    backgroundColor: '#333',
+    color: '#fff',
   },
   colorPicker: {
     flexDirection: 'row',
@@ -208,7 +244,7 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontFamily: 'amaticSCBold',
-    fontSize:24,
+    fontSize: 24,
     color: 'white',
   },
   expandedControls: {
@@ -220,6 +256,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 12,
+    color: '#000',
+  },
+  darkExpandedInput: {
+    backgroundColor: '#333',
+    color: '#fff',
   },
   deleteButton: {
     backgroundColor: '#e74c3c',
