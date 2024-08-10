@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -6,10 +6,18 @@ import {
   TouchableOpacity,
   TextInput,
   useColorScheme,
+  Animated,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const NoteManager = () => {
   const [notes, setNotes] = useState([]);
@@ -17,6 +25,8 @@ const NoteManager = () => {
   const [newNoteText, setNewNoteText] = useState("");
   const [expandedNoteId, setExpandedNoteId] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const colors = [
     "#9b59b6",
@@ -102,13 +112,32 @@ const NoteManager = () => {
     saveNotes(updatedNotes);
   };
 
+  const handleInputFocus = () => {
+    setIsInputFocused(true);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       <View style={styles.headerContainer}>
         <Text style={[styles.headerText, isDarkMode && styles.darkText]}>
           Mis Notas
         </Text>
-
         <TouchableOpacity
           style={styles.darkModeButton}
           onPress={toggleDarkMode}
@@ -127,25 +156,44 @@ const NoteManager = () => {
           placeholderTextColor={isDarkMode ? "#999" : "#666"}
           value={newNoteText}
           onChangeText={setNewNoteText}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
         />
       </View>
-      <View style={styles.colorPicker}>
-        {colors.map((color) => (
-          <TouchableOpacity
-            key={color}
-            style={[
-              styles.colorOption,
-              newNoteColor === color && styles.selectedColor,
-            ]}
-            onPress={() => setNewNoteColor(color)}
-          >
-            <View style={[styles.colorPreview, { backgroundColor: color }]} />
+      {isInputFocused && (
+        <Animated.View 
+          style={[
+            styles.colorPickerContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{
+                translateY: fadeAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-50, 0]
+                })
+              }]
+            }
+          ]}
+        >
+          <View style={styles.colorPicker}>
+            {colors.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.colorOption,
+                  newNoteColor === color && styles.selectedColor,
+                ]}
+                onPress={() => setNewNoteColor(color)}
+              >
+                <View style={[styles.colorPreview, { backgroundColor: color }]} />
+              </TouchableOpacity>
+            ))}
+          </View>
+          <TouchableOpacity style={styles.addNoteButton} onPress={createNote}>
+            <Feather name="plus" size={24} color="white" />
           </TouchableOpacity>
-        ))}
-        <TouchableOpacity style={styles.addNoteButton} onPress={createNote}>
-          <Feather name="plus" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+        </Animated.View>
+      )}
       <ScrollView style={styles.notesContainer}>
         <View style={styles.notesGrid}>
           {notes.map((note) => (
@@ -257,6 +305,13 @@ const styles = StyleSheet.create({
   darkInput: {
     backgroundColor: "#333",
     color: "#fff",
+  },
+  colorPickerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    overflow: "hidden",
   },
   colorPicker: {
     flexDirection: "row",
