@@ -13,14 +13,34 @@ const NoteManager = () => {
 
   const colors = ['#9b59b6', '#3498db', '#2ecc71', '#e67e22', '#e74c3c'];
 
+  const saveNotes = async (notesToSave) => {
+    try {
+      await AsyncStorage.setItem('notes', JSON.stringify(notesToSave));
+    } catch (error) {
+      console.error('Error saving notes:', error);
+    }
+  };
+
+  const loadNotes = async () => {
+    try {
+      const savedNotes = await AsyncStorage.getItem('notes');
+      if (savedNotes !== null) {
+        setNotes(JSON.parse(savedNotes));
+      }
+    } catch (error) {
+      console.error('Error loading notes:', error);
+    }
+  };
+
   useEffect(() => {
-    const loadDarkMode = async () => {
+    const loadData = async () => {
       const savedMode = await AsyncStorage.getItem('isDarkMode');
       if (savedMode !== null) {
         setIsDarkMode(JSON.parse(savedMode));
       }
+      await loadNotes();
     };
-    loadDarkMode();
+    loadData();
   }, []);
 
   const toggleDarkMode = async () => {
@@ -31,16 +51,20 @@ const NoteManager = () => {
 
   const createNote = () => {
     if (newNoteText.trim() !== '') {
-      setNotes([
+      const updatedNotes = [
         ...notes,
         { id: Date.now(), text: newNoteText, color: newNoteColor },
-      ]);
+      ];
+      setNotes(updatedNotes);
+      saveNotes(updatedNotes);
       setNewNoteText('');
     }
   };
 
   const deleteNote = (id) => {
-    setNotes(notes.filter((note) => note.id !== id));
+    const updatedNotes = notes.filter((note) => note.id !== id);
+    setNotes(updatedNotes);
+    saveNotes(updatedNotes);
     setExpandedNoteId(null);
   };
 
@@ -49,19 +73,19 @@ const NoteManager = () => {
   };
 
   const updateNoteColor = (id, color) => {
-    setNotes(
-      notes.map((note) =>
-        note.id === id ? { ...note, color } : note
-      )
+    const updatedNotes = notes.map((note) =>
+      note.id === id ? { ...note, color } : note
     );
+    setNotes(updatedNotes);
+    saveNotes(updatedNotes);
   };
 
   const updateNoteText = (id, text) => {
-    setNotes(
-      notes.map((note) =>
-        note.id === id ? { ...note, text } : note
-      )
+    const updatedNotes = notes.map((note) =>
+      note.id === id ? { ...note, text } : note
     );
+    setNotes(updatedNotes);
+    saveNotes(updatedNotes);
   };
 
   return (
