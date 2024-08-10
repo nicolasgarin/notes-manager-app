@@ -1,40 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, useColorScheme } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { Feather } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  useColorScheme,
+} from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NoteManager = () => {
   const [notes, setNotes] = useState([]);
-  const [newNoteColor, setNewNoteColor] = useState('#9b59b6');
-  const [newNoteText, setNewNoteText] = useState('');
+  const [newNoteColor, setNewNoteColor] = useState("#9b59b6");
+  const [newNoteText, setNewNoteText] = useState("");
   const [expandedNoteId, setExpandedNoteId] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const colors = ['#9b59b6', '#3498db', '#2ecc71', '#e67e22', '#e74c3c'];
+  const colors = [
+    "#9b59b6",
+    "#3498db",
+    "#2ecc71",
+    "#e67e22",
+    "#e74c3c",
+    "#454545",
+  ];
 
   const saveNotes = async (notesToSave) => {
     try {
-      await AsyncStorage.setItem('notes', JSON.stringify(notesToSave));
+      await AsyncStorage.setItem("notes", JSON.stringify(notesToSave));
     } catch (error) {
-      console.error('Error saving notes:', error);
+      console.error("Error saving notes:", error);
     }
   };
 
   const loadNotes = async () => {
     try {
-      const savedNotes = await AsyncStorage.getItem('notes');
+      const savedNotes = await AsyncStorage.getItem("notes");
       if (savedNotes !== null) {
         setNotes(JSON.parse(savedNotes));
       }
     } catch (error) {
-      console.error('Error loading notes:', error);
+      console.error("Error loading notes:", error);
     }
   };
 
   useEffect(() => {
     const loadData = async () => {
-      const savedMode = await AsyncStorage.getItem('isDarkMode');
+      const savedMode = await AsyncStorage.getItem("isDarkMode");
       if (savedMode !== null) {
         setIsDarkMode(JSON.parse(savedMode));
       }
@@ -46,18 +60,18 @@ const NoteManager = () => {
   const toggleDarkMode = async () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    await AsyncStorage.setItem('isDarkMode', JSON.stringify(newMode));
+    await AsyncStorage.setItem("isDarkMode", JSON.stringify(newMode));
   };
 
   const createNote = () => {
-    if (newNoteText.trim() !== '') {
+    if (newNoteText.trim() !== "") {
       const updatedNotes = [
         ...notes,
         { id: Date.now(), text: newNoteText, color: newNoteColor },
       ];
       setNotes(updatedNotes);
       saveNotes(updatedNotes);
-      setNewNoteText('');
+      setNewNoteText("");
     }
   };
 
@@ -91,12 +105,19 @@ const NoteManager = () => {
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       <View style={styles.headerContainer}>
-        <Text style={[styles.headerText, isDarkMode && styles.darkText]}>Mis Notas</Text>
-        <TouchableOpacity style={styles.addNoteButton} onPress={createNote}>
-          <Feather name="plus" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.darkModeButton} onPress={toggleDarkMode}>
-          <Feather name={isDarkMode ? "sun" : "moon"} size={24} color={isDarkMode ? "white" : "black"} />
+        <Text style={[styles.headerText, isDarkMode && styles.darkText]}>
+          Mis Notas
+        </Text>
+
+        <TouchableOpacity
+          style={styles.darkModeButton}
+          onPress={toggleDarkMode}
+        >
+          <Feather
+            name={isDarkMode ? "sun" : "moon"}
+            size={24}
+            color={isDarkMode ? "white" : "black"}
+          />
         </TouchableOpacity>
       </View>
       <View style={styles.inputContainer}>
@@ -107,20 +128,23 @@ const NoteManager = () => {
           value={newNoteText}
           onChangeText={setNewNoteText}
         />
-        <View style={styles.colorPicker}>
-          {colors.map((color) => (
-            <TouchableOpacity
-              key={color}
-              style={[
-                styles.colorOption,
-                newNoteColor === color && styles.selectedColor,
-              ]}
-              onPress={() => setNewNoteColor(color)}
-            >
-              <View style={[styles.colorPreview, { backgroundColor: color }]} />
-            </TouchableOpacity>
-          ))}
-        </View>
+      </View>
+      <View style={styles.colorPicker}>
+        {colors.map((color) => (
+          <TouchableOpacity
+            key={color}
+            style={[
+              styles.colorOption,
+              newNoteColor === color && styles.selectedColor,
+            ]}
+            onPress={() => setNewNoteColor(color)}
+          >
+            <View style={[styles.colorPreview, { backgroundColor: color }]} />
+          </TouchableOpacity>
+        ))}
+        <TouchableOpacity style={styles.addNoteButton} onPress={createNote}>
+          <Feather name="plus" size={24} color="white" />
+        </TouchableOpacity>
       </View>
       <ScrollView style={styles.notesContainer}>
         <View style={styles.notesGrid}>
@@ -130,7 +154,7 @@ const NoteManager = () => {
               style={[
                 styles.noteCard,
                 { backgroundColor: note.color },
-                expandedNoteId === note.id && styles.expandedNote,
+                expandedNoteId === note.id && styles.expandedNoteCard,
               ]}
               onPress={() => toggleExpansion(note.id)}
             >
@@ -138,7 +162,10 @@ const NoteManager = () => {
               {expandedNoteId === note.id && (
                 <View style={styles.expandedControls}>
                   <TextInput
-                    style={[styles.expandedInput, isDarkMode && styles.darkExpandedInput]}
+                    style={[
+                      styles.expandedInput,
+                      isDarkMode && styles.darkExpandedInput,
+                    ]}
                     value={note.text}
                     onChangeText={(text) => updateNoteText(note.id, text)}
                   />
@@ -153,7 +180,10 @@ const NoteManager = () => {
                         onPress={() => updateNoteColor(note.id, color)}
                       >
                         <View
-                          style={[styles.colorPreview, { backgroundColor: color }]}
+                          style={[
+                            styles.colorPreview,
+                            { backgroundColor: color },
+                          ]}
                         />
                       </TouchableOpacity>
                     ))}
@@ -177,30 +207,30 @@ const NoteManager = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: "#faf2f2",
     paddingHorizontal: 20,
     paddingVertical: 30,
   },
   darkContainer: {
-    backgroundColor: '#121212',
+    backgroundColor: "#121212",
   },
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   headerText: {
-    fontFamily: 'amaticSCBold',
-    fontSize: 24,
-    fontWeight: 'regular',
-    color: '#000',
+    fontFamily: "amaticSCBold",
+    fontSize: 30,
+    fontWeight: "regular",
+    color: "#000",
   },
   darkText: {
-    color: '#fff',
+    color: "#fff",
   },
   addNoteButton: {
-    backgroundColor: '#9b59b6',
+    backgroundColor: "#9b59b6",
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 8,
@@ -209,34 +239,38 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   input: {
-    fontFamily: 'amaticSCBold',
+    fontFamily: "amaticSCBold",
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginRight: 12,
-    color: '#000',
+    color: "#000",
+    fontSize: 20,
   },
   darkInput: {
-    backgroundColor: '#333',
-    color: '#fff',
+    backgroundColor: "#333",
+    color: "#fff",
   },
   colorPicker: {
-    flexDirection: 'row',
+    flexDirection: "row",
+    marginBottom: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   colorOption: {
     width: 32,
     height: 32,
     borderRadius: 16,
     marginRight: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   colorPreview: {
     width: 24,
@@ -245,70 +279,77 @@ const styles = StyleSheet.create({
   },
   selectedColor: {
     borderWidth: 2,
-    borderColor: 'white',
+    borderColor: "white",
   },
   notesContainer: {
     flex: 1,
   },
   notesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   noteCard: {
-    width: '48%',
-    backgroundColor: '#9b59b6',
-    borderRadius: 8,
+    width: "48%",
+    backgroundColor: "#9b59b6",
+    borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
     marginBottom: 16,
     transform: [{ scale: 1 }],
     opacity: 1,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    overflow: 'hidden',
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    overflow: "hidden",
   },
-  expandedNote: {
-    width: '100%',
-    transform: [{ scale: 1.05 }],
-    elevation: 8,
+  expandedNoteCard: {
+    width: "100%",
+    transform: [{ scale: 1.02 }],
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+    marginBottom: 24,
   },
   noteText: {
-    fontFamily: 'amaticSCBold',
+    fontFamily: "amaticSCBold",
     fontSize: 24,
-    color: 'white',
+    color: "white",
+    marginBottom: 8,
   },
   expandedControls: {
     marginTop: 12,
+    padding: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 8,
   },
   expandedInput: {
-    backgroundColor: 'white',
+    fontFamily: "amaticSCBold",
+    fontSize: 16,
+    backgroundColor: "white",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 12,
-    color: '#000',
+    color: "#000",
+    minHeight: 100,
+    textAlignVertical: "top",
   },
   darkExpandedInput: {
-    backgroundColor: '#333',
-    color: '#fff',
+    backgroundColor: "#333",
+    color: "#fff",
   },
   deleteButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: "#e74c3c",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    alignSelf: 'flex-end',
-    transform: [{ scale: 1 }],
-    opacity: 1,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    alignSelf: "flex-end",
+    marginTop: 8,
   },
 });
 
