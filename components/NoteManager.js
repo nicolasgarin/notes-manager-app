@@ -14,6 +14,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import StickyNote from "./StickyNote";
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -340,34 +341,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   notesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
   },
   noteCard: {
-    width: "48%",
-    backgroundColor: "#9b59b6",
-    borderRadius: 12,
+    width: '100%',
+    backgroundColor: '#9b59b6',
+    borderRadius: 2,
     paddingVertical: 16,
     paddingHorizontal: 12,
     marginBottom: 16,
-    transform: [{ scale: 1 }],
-    opacity: 1,
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-    overflow: "hidden",
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   expandedNoteCard: {
-    width: "100%",
     transform: [{ scale: 1.02 }],
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
     marginBottom: 24,
   },
   noteText: {
