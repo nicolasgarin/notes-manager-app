@@ -16,7 +16,10 @@ import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StickyNote from "./StickyNote";
 
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -162,18 +165,20 @@ const NoteManager = () => {
         />
       </View>
       {isInputFocused && (
-        <Animated.View 
+        <Animated.View
           style={[
             styles.colorPickerContainer,
             {
               opacity: fadeAnim,
-              transform: [{
-                translateY: fadeAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-50, 0]
-                })
-              }]
-            }
+              transform: [
+                {
+                  translateY: fadeAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-50, 0],
+                  }),
+                },
+              ],
+            },
           ]}
         >
           <View style={styles.colorPicker}>
@@ -186,7 +191,9 @@ const NoteManager = () => {
                 ]}
                 onPress={() => setNewNoteColor(color)}
               >
-                <View style={[styles.colorPreview, { backgroundColor: color }]} />
+                <View
+                  style={[styles.colorPreview, { backgroundColor: color }]}
+                />
               </TouchableOpacity>
             ))}
           </View>
@@ -197,56 +204,64 @@ const NoteManager = () => {
       )}
       <ScrollView style={styles.notesContainer}>
         <View style={styles.notesGrid}>
-          {notes.map((note) => (
-            <TouchableOpacity
-              key={note.id}
-              style={[
-                styles.noteCard,
-                { backgroundColor: note.color },
-                expandedNoteId === note.id && styles.expandedNoteCard,
-              ]}
-              onPress={() => toggleExpansion(note.id)}
-            >
-              <Text style={styles.noteText}>{note.text}</Text>
-              {expandedNoteId === note.id && (
-                <View style={styles.expandedControls}>
-                  <TextInput
-                    style={[
-                      styles.expandedInput,
-                      isDarkMode && styles.darkExpandedInput,
-                    ]}
-                    value={note.text}
-                    onChangeText={(text) => updateNoteText(note.id, text)}
-                  />
-                  <View style={styles.colorPicker}>
-                    {colors.map((color) => (
-                      <TouchableOpacity
-                        key={color}
-                        style={[
-                          styles.colorOption,
-                          note.color === color && styles.selectedColor,
-                        ]}
-                        onPress={() => updateNoteColor(note.id, color)}
-                      >
-                        <View
+          {notes.map((note) =>
+            expandedNoteId === note.id ? (
+              <TouchableOpacity
+                key={note.id}
+                style={[
+                  styles.noteCard,
+                  { backgroundColor: note.color },
+                  styles.expandedNoteCard,
+                ]}
+                onPress={() => toggleExpansion(note.id)}
+              >
+                <Text style={styles.noteText}>{note.text}</Text>
+                {expandedNoteId === note.id && (
+                  <View style={styles.expandedControls}>
+                    <TextInput
+                      style={[
+                        styles.expandedInput,
+                        isDarkMode && styles.darkExpandedInput,
+                      ]}
+                      value={note.text}
+                      onChangeText={(text) => updateNoteText(note.id, text)}
+                    />
+                    <View style={styles.colorPicker}>
+                      {colors.map((color) => (
+                        <TouchableOpacity
+                          key={color}
                           style={[
-                            styles.colorPreview,
-                            { backgroundColor: color },
+                            styles.colorOption,
+                            note.color === color && styles.selectedColor,
                           ]}
-                        />
-                      </TouchableOpacity>
-                    ))}
+                          onPress={() => updateNoteColor(note.id, color)}
+                        >
+                          <View
+                            style={[
+                              styles.colorPreview,
+                              { backgroundColor: color },
+                            ]}
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteNote(note.id)}
+                    >
+                      <Feather name="trash-2" size={24} color="white" />
+                    </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => deleteNote(note.id)}
-                  >
-                    <Feather name="trash-2" size={24} color="white" />
-                  </TouchableOpacity>
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
+                )}
+              </TouchableOpacity>
+            ) : (
+              <StickyNote
+                key={note.id}
+                note={note}
+                onPress={() => toggleExpansion(note.id)}
+              />
+            )
+          )}
         </View>
       </ScrollView>
     </View>
@@ -341,20 +356,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   notesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     paddingHorizontal: 8,
   },
   noteCard: {
-    width: '100%',
-    backgroundColor: '#9b59b6',
+    width: "100%",
+    backgroundColor: "#9b59b6",
     borderRadius: 2,
     paddingVertical: 16,
     paddingHorizontal: 12,
     marginBottom: 16,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -362,7 +377,7 @@ const styles = StyleSheet.create({
   expandedNoteCard: {
     transform: [{ scale: 1.02 }],
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
